@@ -1,108 +1,97 @@
 package com.allyssad;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Scanner;
-
 public class Main {
-
-    // 2D array: Row 0 -> Coffee Names, Row 1 -> Coffee Prices (as Strings)
-    private static final String[][] coffeeData = {
-            {"Espresso", "Latte", "Cappuccino", "Mocha"},
-            {"50.0", "70.0", "65.0", "80.0"}
-    };
-
-    private static final double VAT_RATE = 0.12;
-
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        int[] orderCount = new int[coffeeData[0].length];  // Stores coffee quantities
-        StringBuilder receipt = new StringBuilder("\n---- Coffee Order Receipt ----\n");
-        double total = 0.0;
+        // First Coffee object (Espresso)
+        Coffee coffee1 = new Coffee(
+                "Espresso", "Arabica", "Medium", 100, "Dark", "Colombia", false, 10,
+                new String[]{"Chocolate", "Nutty"}, "French Press"
+        );
 
-        while (true) {
-            displayMenu();
+        // Second Coffee object (Latte)
+        Coffee coffee2 = new Coffee(
+                "Latte", "Robusta", "Large", 100, "Medium", "Brazil", false, 5,
+                new String[]{"Caramel", "Creamy"}, "Drip"
+        );
 
-            System.out.print("Choose your coffee (1-" + coffeeData[0].length + ", or 0 to finish): ");
-            int choice;
-            try {
-                choice = Integer.parseInt(scanner.nextLine());
-                if (choice == 0) {
-                    break;
-                }
-                if (choice < 1 || choice > coffeeData[0].length) {
-                    System.out.println("Invalid choice. Please try again.");
-                    continue;
-                }
+        // Displaying details of coffee1 (Espresso)
+        System.out.println("Coffee 1 Details:");
+        System.out.println("Name: " + coffee1.name);
+        System.out.println("Type: " + coffee1.type);
+        System.out.println("Size: " + coffee1.size);
+        System.out.println("Base Price: PHP " + coffee1.price);
+        System.out.println("Roast Level: " + coffee1.roastLevel);
+        System.out.println("Origin: " + coffee1.origin);
+        System.out.println("Is Decaf: " + coffee1.isDecaf);
+        System.out.println("Stock: " + coffee1.stock);
+        System.out.println("Flavor Notes: " + String.join(", ", coffee1.flavorNotes));
+        System.out.println("Brew Method: " + coffee1.brewMethod);
+        System.out.println();
 
-                System.out.print("Enter quantity: ");
-                int quantity = Integer.parseInt(scanner.nextLine());
-                if (quantity < 1) {
-                    System.out.println("Quantity must be at least 1. Please try again.");
-                    continue;
-                }
+        // Displaying details of coffee2 (Latte)
+        System.out.println("Coffee 2 Details:");
+        System.out.println("Name: " + coffee2.name);
+        System.out.println("Type: " + coffee2.type);
+        System.out.println("Size: " + coffee2.size);
+        System.out.println("Base Price: PHP " + coffee2.price);
+        System.out.println("Roast Level: " + coffee2.roastLevel);
+        System.out.println("Origin: " + coffee2.origin);
+        System.out.println("Is Decaf: " + coffee2.isDecaf);
+        System.out.println("Stock: " + coffee2.stock);
+        System.out.println("Flavor Notes: " + String.join(", ", coffee2.flavorNotes));
+        System.out.println("Brew Method: " + coffee2.brewMethod);
+        System.out.println();
 
-                orderCount[choice - 1] += quantity;
+        // Calling methods on coffee1 (Espresso)
+        System.out.println("\n=== Coffee 1 ===");
+        System.out.println(coffee1.describe());
+        coffee1.calculatePrice(coffee1.size);
+        coffee1.updateStock(5);
+        coffee1.checkStock();
+        coffee1.addFlavor("Vanilla");
+        coffee1.setDecaf(true);
+        coffee1.changeRoastLevel("Light");
+        coffee1.discount(15);
 
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Please enter a number.");
-            }
-        }
+        // Calling methods on coffee2 (Latte)
+        System.out.println("\n=== Coffee 2 ===");
+        System.out.println(coffee2.describe());
+        coffee2.calculatePrice(coffee2.size);
+        coffee2.updateStock(-2);
+        coffee2.checkStock();
+        coffee2.addFlavor("Hazelnut");
+        coffee2.setDecaf(false);
+        coffee2.changeRoastLevel("Dark");
+        coffee2.discount(10);
 
-        // Summarize the order
-        for (int i = 0; i < coffeeData[0].length; i++) {
-            if (orderCount[i] > 0) {
-                double price = Double.parseDouble(coffeeData[1][i]); // Convert price from String to double
-                double itemTotal = price * orderCount[i];
-                total += itemTotal;
-                receipt.append(String.format("%d x %s @ %.2f each = %.2f\n",
-                        orderCount[i], coffeeData[0][i], price, itemTotal));
-            }
-        }
+        // Displaying updated details of coffee1
+        System.out.println("\nUpdated Coffee 1 Details:");
+        System.out.println(coffee1.describe());
+        System.out.println("Name: " + coffee1.name);
+        System.out.println("Type: " + coffee1.type);
+        System.out.println("Size: " + coffee1.size);
+        System.out.println("Updated Price: PHP " + coffee1.price);
+        System.out.println("Roast Level: " + coffee1.roastLevel);
+        System.out.println("Origin: " + coffee1.origin);
+        System.out.println("Is Decaf: " + coffee1.isDecaf);
+        System.out.println("Stock: " + coffee1.stock);
+        System.out.println("Flavor Notes: " + String.join(", ", coffee1.flavorNotes));
+        System.out.println("Brew Method: " + coffee1.brewMethod);
+        System.out.println();
 
-        double vat = total * VAT_RATE;
-        double grandTotal = total + vat;
-
-        receipt.append("---------------------------\n")
-                .append(String.format("Subtotal: %.2f\n", total))
-                .append(String.format("VAT (12%%): %.2f\n", vat))
-                .append(String.format("Grand Total: %.2f\n", grandTotal))
-                .append("---------------------------\n");
-
-        System.out.println(receipt);
-
-        saveReceiptToFile(receipt.toString());
-        scanner.close();
-    }
-
-
-    /**
-     * Method to display the coffee menu to the user.
-     */
-    private static void displayMenu() {
-        System.out.println("\n--- Coffee Menu ---");
-        for (int i = 0; i < coffeeData[0].length; i++) {
-            System.out.printf("%d. %s - %.1f PHP\n", i + 1, coffeeData[0][i], Double.parseDouble(coffeeData[1][i]));
-        }
-        System.out.println("0. Finish Order");
-    }
-
-    /**
-     * Method to save the receipt to a file.
-     * @param receipt The receipt to save
-     */
-    private static void saveReceiptToFile(String receipt) {
-        File saveDir = new File("target/receipts");
-        if (!saveDir.exists()) {
-            saveDir.mkdirs();
-        }
-        File receiptFile = new File(saveDir, "CoffeeReceipt.txt");
-        try (FileWriter writer = new FileWriter(receiptFile)) {
-            writer.write(receipt);
-            System.out.println("\nReceipt saved to CoffeeReceipt.txt");
-        } catch (IOException e) {
-            System.out.println("Error saving receipt: " + e.getMessage());
-        }
+        // Displaying updated details of coffee2
+        System.out.println("\nUpdated Coffee 2 Details:");
+        System.out.println(coffee2.describe());
+        System.out.println("Name: " + coffee2.name);
+        System.out.println("Type: " + coffee2.type);
+        System.out.println("Size: " + coffee2.size);
+        System.out.println("Updated Price: PHP " + coffee2.price);
+        System.out.println("Roast Level: " + coffee2.roastLevel);
+        System.out.println("Origin: " + coffee2.origin);
+        System.out.println("Is Decaf: " + coffee2.isDecaf);
+        System.out.println("Stock: " + coffee2.stock);
+        System.out.println("Flavor Notes: " + String.join(", ", coffee2.flavorNotes));
+        System.out.println("Brew Method: " + coffee2.brewMethod);
+        System.out.println();
     }
 }
